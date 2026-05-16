@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Bathi Gee Sanda — Guest Portal</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=IM+Fell+English:ital@0;1&family=UnifrakturMaguntia&display=swap" rel="stylesheet">
-<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+<script src="https://unpkg.com/@zxing/library@0.19.1/umd/index.min.js"></script>
 <style>
   :root {
     --rose-deep: #8B1A4A;
@@ -68,49 +68,8 @@
   }
 
   /* ── Sponsor banner ── */
-  .sponsor-bar {
-    display: flex; align-items: center; justify-content: flex-end; gap: 10px;
-    margin-bottom: 10px;
-    padding: 8px 16px;
-    background: linear-gradient(90deg, transparent, rgba(200,151,58,0.08), rgba(200,151,58,0.15));
-    border-bottom: 1px solid rgba(200,151,58,0.2);
-    border-radius: 4px;
-  }
-  .sponsor-bar .label {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 11px; letter-spacing: 3px; text-transform: uppercase;
-    color: var(--gold); opacity: 0.7;
-  }
-  .sponsor-logo {
-    display: flex; align-items: center; gap: 8px;
-    text-decoration: none;
-  }
-  .sponsor-logo-icon {
-    width: 40px; height: 40px;
-    background: linear-gradient(135deg, var(--gold), var(--gold-light));
-    border-radius: 6px;
-    display: flex; align-items: center; justify-content: center;
-    box-shadow: 0 2px 8px var(--shadow-gold);
-    position: relative; overflow: hidden;
-  }
-  .sponsor-logo-icon::before {
-    content: '';
-    position: absolute; inset: 3px;
-    border: 1px solid rgba(255,255,255,0.3);
-    border-radius: 4px;
-  }
-  .sponsor-logo-icon svg { width: 26px; height: 26px; }
-  .sponsor-name {
-    font-family: 'Playfair Display', serif;
-    font-size: 15px; font-weight: 700; letter-spacing: 1px;
-    color: var(--gold-light);
-    line-height: 1;
-  }
-  .sponsor-name small {
-    display: block; font-size: 8px; letter-spacing: 2px;
-    text-transform: uppercase; color: var(--gold); font-weight: 400;
-    font-family: 'Cormorant Garamond', serif;
-  }
+
+
 
   /* ── Main card ── */
   .main-card {
@@ -525,25 +484,6 @@
 
 <div class="page-wrap">
 
-  <!-- Sponsor bar -->
-  <div class="sponsor-bar">
-    <span class="label">Title Sponsor</span>
-    <a href="https://homelands.lk" target="_blank" class="sponsor-logo" title="Home Lands Holding">
-      <div class="sponsor-logo-icon">
-        <!-- Home Lands logo representation: a stylized H + roof -->
-        <svg viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M4 22V10L13 4L22 10V22" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          <path d="M9 22V15H17V22" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          <path d="M10 11H16" stroke="rgba(255,255,255,0.6)" stroke-width="1.5" stroke-linecap="round"/>
-        </svg>
-      </div>
-      <div class="sponsor-name">
-        Home Lands
-        <small>Holding Pvt Ltd</small>
-      </div>
-    </a>
-  </div>
-
   <!-- Main card -->
   <div class="main-card">
     <div class="card-border"></div>
@@ -776,7 +716,7 @@
   </div><!-- /main-card -->
 
   <div class="page-footer">
-    <p>Presented by <a href="https://homelands.lk" target="_blank">Home Lands Holding Pvt Ltd</a> &nbsp;✦&nbsp; Bathi Gee Sanda 2025</p>
+    <p>Bathi Gee Sanda 2025</p>
   </div>
 
 </div><!-- /page-wrap -->
@@ -858,7 +798,6 @@ const GUESTS = {
 // ═══════════════════════════════════════════
 //  TAB SWITCHING
 // ═══════════════════════════════════════════
-let qrScanner = null;
 let qrRunning = false;
 
 function switchTab(tab) {
@@ -903,55 +842,94 @@ function lookupCode() {
 }
 
 // ═══════════════════════════════════════════
-//  QR SCANNER
+//  QR SCANNER  (ZXing)
 // ═══════════════════════════════════════════
+let videoEl = null;
+let streamRef = null;
+let zxingReader = null;
+let scanLoop = null;
+
 function startQR() {
   if (qrRunning) return;
   hideError('qr-error');
   hidePass();
-  document.getElementById('qr-placeholder').style.display = 'none';
-  document.getElementById('qr-start-btn').textContent = '⌛ Camera starting…';
 
-  qrScanner = new Html5Qrcode("reader");
-  qrScanner.start(
-    { facingMode: "environment" },
-    { fps: 10, qrbox: { width: 220, height: 220 } },
-    (decodedText) => {
-      stopQR();
-      const code = decodedText.trim().toUpperCase();
-      const guest = GUESTS[code];
-      switchTab('code');
-      document.getElementById('guestCode').value = code;
-      if (guest) {
-        showPass(guest, code);
-      } else {
-        showError('code-error', 'QR code scanned but not found in guest list. Please contact the event desk.');
-      }
-    },
-    () => {}
-  ).then(() => {
-    qrRunning = true;
-    document.getElementById('qr-start-btn').textContent = '⏹ Stop Camera';
-    document.getElementById('qr-start-btn').onclick = stopQR;
-  }).catch(err => {
-    document.getElementById('qr-placeholder').style.display = 'flex';
-    document.getElementById('qr-start-btn').textContent = '✦ Open Camera to Scan ✦';
-    showError('qr-error', 'Camera access denied or unavailable. Please enter your code manually.');
-    console.error(err);
-  });
+  const btn = document.getElementById('qr-start-btn');
+  const placeholder = document.getElementById('qr-placeholder');
+  const readerDiv = document.getElementById('reader');
+
+  btn.textContent = '⌛ Starting camera…';
+  btn.disabled = true;
+
+  // Build video element inside #reader
+  readerDiv.innerHTML = '';
+  videoEl = document.createElement('video');
+  videoEl.setAttribute('playsinline', '');
+  videoEl.setAttribute('muted', '');
+  videoEl.style.cssText = 'width:100%;max-height:280px;object-fit:cover;border-radius:3px;display:block;';
+  readerDiv.appendChild(videoEl);
+  placeholder.style.display = 'none';
+
+  navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' }, audio: false })
+    .then(stream => {
+      streamRef = stream;
+      videoEl.srcObject = stream;
+      return videoEl.play();
+    })
+    .then(() => {
+      qrRunning = true;
+      btn.textContent = '⏹ Stop Camera';
+      btn.disabled = false;
+      btn.onclick = stopQR;
+
+      // ZXing decode loop
+      zxingReader = new ZXing.BrowserQRCodeReader();
+      scanLoop = setInterval(async () => {
+        if (!qrRunning || !videoEl) return;
+        try {
+          const result = await zxingReader.decodeFromVideoElement(videoEl);
+          if (result) {
+            clearInterval(scanLoop);
+            const code = result.getText().trim().toUpperCase();
+            stopQR();
+            document.getElementById('guestCode').value = code;
+            switchTab('code');
+            const guest = GUESTS[code];
+            if (guest) {
+              showPass(guest, code);
+            } else {
+              showError('code-error', 'QR code scanned but not found in guest list. Please contact the event desk.');
+            }
+          }
+        } catch(e) { /* no QR in frame yet — keep scanning */ }
+      }, 300);
+    })
+    .catch(err => {
+      readerDiv.innerHTML = '';
+      placeholder.style.display = '';
+      btn.textContent = '✦ Open Camera to Scan ✦';
+      btn.disabled = false;
+      btn.onclick = startQR;
+      showError('qr-error', 'Camera access denied or unavailable. Please allow camera permission and try again, or enter your code manually.');
+      console.error(err);
+    });
 }
 
 function stopQR() {
-  if (qrScanner && qrRunning) {
-    qrScanner.stop().then(() => {
-      qrScanner.clear();
-      qrRunning = false;
-      document.getElementById('reader').innerHTML = '';
-      document.getElementById('qr-placeholder').style.display = '';
-      document.getElementById('qr-start-btn').textContent = '✦ Open Camera to Scan ✦';
-      document.getElementById('qr-start-btn').onclick = startQR;
-    });
+  clearInterval(scanLoop);
+  scanLoop = null;
+  qrRunning = false;
+  if (streamRef) {
+    streamRef.getTracks().forEach(t => t.stop());
+    streamRef = null;
   }
+  if (videoEl) { videoEl.srcObject = null; videoEl = null; }
+  document.getElementById('reader').innerHTML = '';
+  document.getElementById('qr-placeholder').style.display = '';
+  const btn = document.getElementById('qr-start-btn');
+  btn.textContent = '✦ Open Camera to Scan ✦';
+  btn.disabled = false;
+  btn.onclick = startQR;
 }
 
 // ═══════════════════════════════════════════
