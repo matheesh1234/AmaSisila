@@ -1,0 +1,1006 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bathi Gee Sanda — Guest Portal</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=IM+Fell+English:ital@0;1&family=UnifrakturMaguntia&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+<style>
+  :root {
+    --rose-deep: #8B1A4A;
+    --rose-mid: #C2185B;
+    --rose-blush: #F8BBD9;
+    --rose-pale: #FCE4EC;
+    --rose-cream: #FFF0F5;
+    --gold: #C8973A;
+    --gold-light: #E8C06A;
+    --gold-pale: #F5E6C8;
+    --parchment: #F5ECD7;
+    --parchment-dark: #E8D5B0;
+    --ink: #3B1520;
+    --shadow-rose: rgba(139,26,74,0.35);
+    --shadow-gold: rgba(200,151,58,0.4);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background-color: #1A0A10;
+    background-image:
+      radial-gradient(ellipse at 20% 10%, #3D1025 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 90%, #2A0D1A 0%, transparent 50%),
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");
+    min-height: 100vh;
+    font-family: 'Cormorant Garamond', serif;
+    color: var(--ink);
+    overflow-x: hidden;
+  }
+
+  /* ── Floating lotus petals bg decoration ── */
+  .bg-petals {
+    position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden;
+  }
+  .bg-petals span {
+    position: absolute;
+    width: 60px; height: 90px;
+    border-radius: 50% 0 50% 0;
+    background: radial-gradient(ellipse, rgba(194,24,91,0.06) 0%, transparent 70%);
+    animation: floatPetal 18s infinite ease-in-out;
+    transform-origin: center;
+  }
+  .bg-petals span:nth-child(1)  { left:5%;  top:10%; animation-delay:0s;   animation-duration:20s; width:50px;  height:80px; }
+  .bg-petals span:nth-child(2)  { left:85%; top:20%; animation-delay:3s;   animation-duration:25s; width:70px;  height:100px; }
+  .bg-petals span:nth-child(3)  { left:50%; top:60%; animation-delay:7s;   animation-duration:22s; width:40px;  height:60px; }
+  .bg-petals span:nth-child(4)  { left:20%; top:80%; animation-delay:1s;   animation-duration:28s; width:80px;  height:110px; }
+  .bg-petals span:nth-child(5)  { left:70%; top:70%; animation-delay:5s;   animation-duration:19s; width:55px;  height:85px; }
+  @keyframes floatPetal {
+    0%,100% { transform: translateY(0) rotate(0deg) scale(1); opacity:0.4; }
+    50%      { transform: translateY(-30px) rotate(15deg) scale(1.1); opacity:0.8; }
+  }
+
+  /* ── Main wrapper ── */
+  .page-wrap {
+    position: relative; z-index: 1;
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 30px 20px 60px;
+  }
+
+  /* ── Sponsor banner ── */
+  .sponsor-bar {
+    display: flex; align-items: center; justify-content: flex-end; gap: 10px;
+    margin-bottom: 10px;
+    padding: 8px 16px;
+    background: linear-gradient(90deg, transparent, rgba(200,151,58,0.08), rgba(200,151,58,0.15));
+    border-bottom: 1px solid rgba(200,151,58,0.2);
+    border-radius: 4px;
+  }
+  .sponsor-bar .label {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 11px; letter-spacing: 3px; text-transform: uppercase;
+    color: var(--gold); opacity: 0.7;
+  }
+  .sponsor-logo {
+    display: flex; align-items: center; gap: 8px;
+    text-decoration: none;
+  }
+  .sponsor-logo-icon {
+    width: 40px; height: 40px;
+    background: linear-gradient(135deg, var(--gold), var(--gold-light));
+    border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 2px 8px var(--shadow-gold);
+    position: relative; overflow: hidden;
+  }
+  .sponsor-logo-icon::before {
+    content: '';
+    position: absolute; inset: 3px;
+    border: 1px solid rgba(255,255,255,0.3);
+    border-radius: 4px;
+  }
+  .sponsor-logo-icon svg { width: 26px; height: 26px; }
+  .sponsor-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 15px; font-weight: 700; letter-spacing: 1px;
+    color: var(--gold-light);
+    line-height: 1;
+  }
+  .sponsor-name small {
+    display: block; font-size: 8px; letter-spacing: 2px;
+    text-transform: uppercase; color: var(--gold); font-weight: 400;
+    font-family: 'Cormorant Garamond', serif;
+  }
+
+  /* ── Main card ── */
+  .main-card {
+    background: linear-gradient(160deg, #FDF5E8 0%, #F9ECD6 40%, #F5E4D0 100%);
+    border-radius: 4px;
+    box-shadow:
+      0 0 0 1px rgba(200,151,58,0.3),
+      0 0 0 5px rgba(139,26,74,0.08),
+      0 4px 6px rgba(0,0,0,0.3),
+      0 20px 60px rgba(0,0,0,0.5),
+      inset 0 1px 0 rgba(255,255,255,0.6);
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* Aged paper texture overlay */
+  .main-card::before {
+    content: '';
+    position: absolute; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none; z-index: 0;
+  }
+
+  /* Corner ornaments */
+  .corner { position: absolute; width: 70px; height: 70px; z-index: 2; }
+  .corner svg { width: 100%; height: 100%; }
+  .corner-tl { top: 10px; left: 10px; }
+  .corner-tr { top: 10px; right: 10px; transform: scaleX(-1); }
+  .corner-bl { bottom: 10px; left: 10px; transform: scaleY(-1); }
+  .corner-br { bottom: 10px; right: 10px; transform: scale(-1); }
+
+  /* Border frame */
+  .card-border {
+    position: absolute; inset: 10px; border: 1.5px solid rgba(200,151,58,0.5);
+    border-radius: 2px; pointer-events: none; z-index: 2;
+    box-shadow: inset 0 0 30px rgba(200,151,58,0.05);
+  }
+  .card-border::after {
+    content: '';
+    position: absolute; inset: 6px;
+    border: 0.5px solid rgba(200,151,58,0.25);
+    border-radius: 1px;
+  }
+
+  .card-content { position: relative; z-index: 3; padding: 50px 60px 50px; }
+
+  /* ── Header ── */
+  .header { text-align: center; margin-bottom: 36px; }
+
+  .dharma-wheel {
+    width: 56px; height: 56px; margin: 0 auto 16px;
+    animation: rotateWheel 20s linear infinite;
+    filter: drop-shadow(0 2px 6px var(--shadow-gold));
+  }
+  @keyframes rotateWheel { to { transform: rotate(360deg); } }
+
+  .event-subtitle {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 12px; letter-spacing: 5px; text-transform: uppercase;
+    color: var(--rose-mid); margin-bottom: 8px;
+    text-shadow: 0 1px 2px rgba(194,24,91,0.2);
+  }
+
+  .event-title {
+    font-family: 'UnifrakturMaguntia', cursive;
+    font-size: clamp(36px, 7vw, 64px);
+    line-height: 1;
+    color: var(--rose-deep);
+    text-shadow:
+      2px 2px 0 rgba(139,26,74,0.15),
+      4px 4px 8px rgba(139,26,74,0.1),
+      0 0 30px rgba(194,24,91,0.08);
+    margin-bottom: 4px;
+    letter-spacing: 2px;
+  }
+
+  .event-title-sinhala {
+    font-family: 'IM Fell English', serif;
+    font-size: 18px; font-style: italic;
+    color: var(--rose-mid); margin-bottom: 16px;
+    opacity: 0.85;
+  }
+
+  .divider {
+    display: flex; align-items: center; gap: 12px;
+    margin: 12px 0;
+  }
+  .divider-line { flex: 1; height: 1px; background: linear-gradient(90deg, transparent, var(--gold), transparent); }
+  .divider-lotus { color: var(--gold); font-size: 18px; line-height: 1; flex-shrink: 0; }
+
+  .event-meta {
+    display: flex; justify-content: center; gap: 24px; flex-wrap: wrap;
+    margin-top: 14px;
+  }
+  .meta-item {
+    text-align: center;
+  }
+  .meta-label {
+    font-size: 9px; letter-spacing: 3px; text-transform: uppercase;
+    color: var(--gold); display: block; margin-bottom: 3px;
+  }
+  .meta-value {
+    font-family: 'Playfair Display', serif;
+    font-size: 13px; color: var(--rose-deep); font-weight: 600;
+  }
+
+  /* ── Section heading ── */
+  .section-heading {
+    text-align: center; margin-bottom: 20px;
+  }
+  .section-heading h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px; font-weight: 700; letter-spacing: 1px;
+    color: var(--rose-deep);
+    text-shadow: 1px 1px 3px rgba(139,26,74,0.15);
+  }
+  .section-heading p {
+    font-size: 13px; color: #7A4A5A; margin-top: 5px;
+    font-style: italic;
+  }
+
+  /* ── Tabs ── */
+  .tabs {
+    display: flex; gap: 0; margin-bottom: 24px;
+    border: 1.5px solid rgba(200,151,58,0.4);
+    border-radius: 3px; overflow: hidden;
+    box-shadow: 0 3px 10px rgba(139,26,74,0.1), inset 0 1px 0 rgba(255,255,255,0.5);
+  }
+  .tab-btn {
+    flex: 1; padding: 12px 8px;
+    background: transparent; border: none; cursor: pointer;
+    font-family: 'Playfair Display', serif;
+    font-size: 13px; font-weight: 600; letter-spacing: 0.5px;
+    color: #9A6070;
+    transition: all 0.3s;
+    position: relative;
+    border-right: 1px solid rgba(200,151,58,0.3);
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+  }
+  .tab-btn:last-child { border-right: none; }
+  .tab-btn.active {
+    background: linear-gradient(160deg, var(--rose-deep), var(--rose-mid));
+    color: var(--rose-cream);
+    box-shadow: inset 0 -2px 0 rgba(0,0,0,0.15);
+    text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+  }
+  .tab-btn:not(.active):hover {
+    background: rgba(194,24,91,0.06);
+    color: var(--rose-deep);
+  }
+
+  /* ── Input section ── */
+  .input-panel { display: none; }
+  .input-panel.active { display: block; }
+
+  .code-input-wrap {
+    position: relative; margin-bottom: 16px;
+  }
+  .code-input-label {
+    display: block;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 12px; letter-spacing: 3px; text-transform: uppercase;
+    color: var(--gold); margin-bottom: 8px;
+  }
+  .code-input {
+    width: 100%;
+    padding: 14px 20px;
+    font-family: 'Playfair Display', serif;
+    font-size: 18px; letter-spacing: 6px; text-align: center;
+    text-transform: uppercase;
+    background: rgba(255,255,255,0.7);
+    border: 1.5px solid rgba(200,151,58,0.4);
+    border-radius: 3px;
+    color: var(--rose-deep);
+    outline: none;
+    transition: all 0.3s;
+    box-shadow: inset 0 2px 8px rgba(139,26,74,0.05), 0 2px 6px rgba(0,0,0,0.08);
+  }
+  .code-input:focus {
+    border-color: var(--rose-mid);
+    background: rgba(255,255,255,0.95);
+    box-shadow: 0 0 0 3px rgba(194,24,91,0.1), inset 0 2px 8px rgba(139,26,74,0.05);
+  }
+  .code-input::placeholder { color: rgba(139,26,74,0.3); letter-spacing: 3px; font-size:14px; }
+
+  .lookup-btn {
+    width: 100%; padding: 14px;
+    background: linear-gradient(160deg, #8B1A4A 0%, #C2185B 60%, #AD1457 100%);
+    border: none; border-radius: 3px; cursor: pointer;
+    font-family: 'Playfair Display', serif;
+    font-size: 14px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
+    color: var(--rose-cream);
+    text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+    transition: all 0.3s;
+    box-shadow:
+      0 4px 0 #6D1238,
+      0 5px 10px rgba(139,26,74,0.4);
+    position: relative; top: 0;
+  }
+  .lookup-btn:hover {
+    background: linear-gradient(160deg, #9D1F56 0%, #D81B60 60%, #C2185B 100%);
+    box-shadow: 0 5px 0 #6D1238, 0 7px 14px rgba(139,26,74,0.5);
+    transform: translateY(-1px);
+  }
+  .lookup-btn:active {
+    top: 3px;
+    box-shadow: 0 1px 0 #6D1238, 0 2px 6px rgba(139,26,74,0.3);
+    transform: translateY(0);
+  }
+  .lookup-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+  /* ── QR Scanner ── */
+  .qr-wrapper {
+    background: rgba(255,255,255,0.5);
+    border: 1.5px solid rgba(200,151,58,0.35);
+    border-radius: 4px; overflow: hidden;
+    box-shadow: inset 0 2px 10px rgba(139,26,74,0.06);
+    margin-bottom: 14px;
+    min-height: 260px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    position: relative;
+  }
+  #reader { width: 100%; }
+  .qr-placeholder {
+    text-align: center; padding: 40px 20px;
+    color: #9A6070;
+  }
+  .qr-placeholder svg { opacity: 0.25; margin-bottom: 12px; }
+  .qr-placeholder p { font-size: 13px; font-style: italic; }
+
+  .qr-start-btn {
+    margin-top: 8px; padding: 10px 28px;
+    background: linear-gradient(160deg, var(--gold), var(--gold-light));
+    border: none; border-radius: 3px; cursor: pointer;
+    font-family: 'Playfair Display', serif;
+    font-size: 12px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
+    color: var(--ink);
+    box-shadow: 0 3px 0 #9A7020, 0 4px 10px rgba(200,151,58,0.3);
+    transition: all 0.3s;
+  }
+  .qr-start-btn:hover { filter: brightness(1.05); transform: translateY(-1px); }
+
+  .qr-note {
+    font-size: 11px; font-style: italic; color: #9A6070;
+    text-align: center; margin-top: 8px;
+  }
+
+  /* ── Error / Result ── */
+  .msg-error {
+    display: none; padding: 12px 16px; border-radius: 3px; margin-top: 14px;
+    background: rgba(139,26,74,0.08); border: 1px solid rgba(139,26,74,0.2);
+    color: var(--rose-deep); font-size: 13px; text-align: center;
+    font-style: italic;
+  }
+  .msg-error.visible { display: block; animation: shake 0.4s ease; }
+  @keyframes shake {
+    0%,100%{ transform:translateX(0); }
+    25%{ transform:translateX(-6px); }
+    75%{ transform:translateX(6px); }
+  }
+
+  /* ── Guest Pass Result ── */
+  .guest-pass {
+    display: none;
+    margin-top: 24px;
+    background: linear-gradient(160deg, #FFF0F5 0%, #FCE4EC 100%);
+    border: 2px solid rgba(194,24,91,0.25);
+    border-radius: 4px;
+    overflow: hidden;
+    box-shadow:
+      0 0 0 4px rgba(200,151,58,0.1),
+      0 8px 30px rgba(139,26,74,0.2),
+      inset 0 1px 0 rgba(255,255,255,0.8);
+    animation: passReveal 0.6s cubic-bezier(0.16,1,0.3,1) forwards;
+    transform-origin: top center;
+  }
+  .guest-pass.visible { display: block; }
+  @keyframes passReveal {
+    from { opacity:0; transform:scaleY(0.85) translateY(-10px); }
+    to   { opacity:1; transform:scaleY(1) translateY(0); }
+  }
+
+  .pass-header {
+    background: linear-gradient(135deg, var(--rose-deep), var(--rose-mid));
+    padding: 16px 24px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .pass-header-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 11px; letter-spacing: 3px; text-transform: uppercase;
+    color: rgba(255,240,245,0.75);
+  }
+  .pass-header-badge {
+    background: var(--gold);
+    color: var(--ink);
+    font-family: 'Playfair Display', serif;
+    font-size: 9px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
+    padding: 3px 10px; border-radius: 20px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  }
+
+  .pass-body { padding: 24px; }
+
+  .pass-guest-name {
+    font-family: 'UnifrakturMaguntia', cursive;
+    font-size: 36px; color: var(--rose-deep);
+    text-shadow: 2px 2px 4px rgba(139,26,74,0.15);
+    margin-bottom: 4px; line-height: 1.1;
+  }
+  .pass-greeting {
+    font-family: 'IM Fell English', serif;
+    font-style: italic; font-size: 14px; color: #7A4A5A;
+    margin-bottom: 20px;
+  }
+
+  .pass-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 14px; margin-bottom: 20px;
+  }
+  .pass-field { }
+  .pass-field-label {
+    font-size: 9px; letter-spacing: 3px; text-transform: uppercase;
+    color: var(--gold); display: block; margin-bottom: 4px;
+  }
+  .pass-field-value {
+    font-family: 'Playfair Display', serif;
+    font-size: 15px; font-weight: 600; color: var(--rose-deep);
+  }
+  .pass-field-value.seat {
+    font-size: 22px; font-weight: 900;
+    text-shadow: 1px 1px 0 rgba(139,26,74,0.2);
+  }
+
+  .pass-perks {
+    border-top: 1px solid rgba(200,151,58,0.2);
+    padding-top: 16px;
+    margin-top: 4px;
+  }
+  .pass-perks-label {
+    font-size: 10px; letter-spacing: 3px; text-transform: uppercase;
+    color: var(--gold); margin-bottom: 10px; display: block;
+  }
+  .perks-list { display: flex; flex-wrap: wrap; gap: 8px; }
+  .perk-tag {
+    padding: 4px 12px;
+    background: rgba(200,151,58,0.1);
+    border: 1px solid rgba(200,151,58,0.3);
+    border-radius: 20px;
+    font-size: 11px; color: #6B3A2A; letter-spacing: 0.5px;
+    font-style: italic;
+    display: flex; align-items: center; gap: 5px;
+  }
+
+  .pass-footer {
+    background: rgba(200,151,58,0.06);
+    border-top: 1px dashed rgba(200,151,58,0.3);
+    padding: 12px 24px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .pass-code-display {
+    font-family: 'Playfair Display', serif;
+    font-size: 16px; letter-spacing: 6px;
+    color: rgba(139,26,74,0.4); font-weight: 700;
+  }
+  .pass-valid {
+    font-size: 10px; color: var(--gold); letter-spacing: 2px; text-transform: uppercase;
+    display: flex; align-items: center; gap: 5px;
+  }
+  .pass-valid-dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: #4CAF50;
+    box-shadow: 0 0 6px rgba(76,175,80,0.6);
+    animation: pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%,100%{ opacity:1; transform:scale(1); }
+    50%{ opacity:0.6; transform:scale(0.85); }
+  }
+
+  /* ── Footer ── */
+  .page-footer {
+    text-align: center; margin-top: 30px;
+    font-size: 11px; letter-spacing: 2px; text-transform: uppercase;
+    color: rgba(200,151,58,0.4);
+  }
+  .page-footer a { color: rgba(200,151,58,0.5); text-decoration: none; }
+
+  /* ── Lotus divider SVG ── */
+  .lotus-ornament {
+    text-align: center; margin: 20px 0;
+    color: var(--gold); opacity: 0.5;
+    font-size: 22px;
+    letter-spacing: 8px;
+  }
+
+  /* ── Responsive ── */
+  @media(max-width: 580px) {
+    .card-content { padding: 40px 24px 40px; }
+    .corner { width: 50px; height: 50px; }
+    .pass-grid { grid-template-columns: 1fr; }
+    .tabs { flex-direction: column; }
+    .tab-btn { border-right: none; border-bottom: 1px solid rgba(200,151,58,0.3); }
+    .tab-btn:last-child { border-bottom: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="bg-petals">
+  <span></span><span></span><span></span><span></span><span></span>
+</div>
+
+<div class="page-wrap">
+
+  <!-- Sponsor bar -->
+  <div class="sponsor-bar">
+    <span class="label">Title Sponsor</span>
+    <a href="https://homelands.lk" target="_blank" class="sponsor-logo" title="Home Lands Holding">
+      <div class="sponsor-logo-icon">
+        <!-- Home Lands logo representation: a stylized H + roof -->
+        <svg viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M4 22V10L13 4L22 10V22" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M9 22V15H17V22" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M10 11H16" stroke="rgba(255,255,255,0.6)" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div class="sponsor-name">
+        Home Lands
+        <small>Holding Pvt Ltd</small>
+      </div>
+    </a>
+  </div>
+
+  <!-- Main card -->
+  <div class="main-card">
+    <div class="card-border"></div>
+
+    <!-- Corner ornaments -->
+    <div class="corner corner-tl">
+      <svg viewBox="0 0 70 70" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M5 5 Q5 35 35 35 Q5 35 5 65" stroke="rgba(200,151,58,0.5)" stroke-width="1" fill="none"/>
+        <path d="M5 5 Q35 5 35 35 Q35 5 65 5" stroke="rgba(200,151,58,0.5)" stroke-width="1" fill="none"/>
+        <circle cx="5" cy="5" r="3" fill="rgba(200,151,58,0.5)"/>
+        <circle cx="35" cy="35" r="2" fill="rgba(200,151,58,0.3)"/>
+        <path d="M12 5 L5 12" stroke="rgba(200,151,58,0.3)" stroke-width="0.8"/>
+        <path d="M18 5 L5 18" stroke="rgba(200,151,58,0.2)" stroke-width="0.6"/>
+        <circle cx="35" cy="5" r="1.5" fill="rgba(200,151,58,0.4)"/>
+        <circle cx="5" cy="35" r="1.5" fill="rgba(200,151,58,0.4)"/>
+      </svg>
+    </div>
+    <div class="corner corner-tr">
+      <svg viewBox="0 0 70 70" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M5 5 Q5 35 35 35 Q5 35 5 65" stroke="rgba(200,151,58,0.5)" stroke-width="1" fill="none"/>
+        <path d="M5 5 Q35 5 35 35 Q35 5 65 5" stroke="rgba(200,151,58,0.5)" stroke-width="1" fill="none"/>
+        <circle cx="5" cy="5" r="3" fill="rgba(200,151,58,0.5)"/>
+        <circle cx="35" cy="35" r="2" fill="rgba(200,151,58,0.3)"/>
+        <circle cx="35" cy="5" r="1.5" fill="rgba(200,151,58,0.4)"/>
+        <circle cx="5" cy="35" r="1.5" fill="rgba(200,151,58,0.4)"/>
+      </svg>
+    </div>
+    <div class="corner corner-bl">
+      <svg viewBox="0 0 70 70" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M5 5 Q5 35 35 35 Q5 35 5 65" stroke="rgba(200,151,58,0.5)" stroke-width="1" fill="none"/>
+        <path d="M5 5 Q35 5 35 35 Q35 5 65 5" stroke="rgba(200,151,58,0.5)" stroke-width="1" fill="none"/>
+        <circle cx="5" cy="5" r="3" fill="rgba(200,151,58,0.5)"/>
+        <circle cx="35" cy="35" r="2" fill="rgba(200,151,58,0.3)"/>
+        <circle cx="35" cy="5" r="1.5" fill="rgba(200,151,58,0.4)"/>
+        <circle cx="5" cy="35" r="1.5" fill="rgba(200,151,58,0.4)"/>
+      </svg>
+    </div>
+    <div class="corner corner-br">
+      <svg viewBox="0 0 70 70" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M5 5 Q5 35 35 35 Q5 35 5 65" stroke="rgba(200,151,58,0.5)" stroke-width="1" fill="none"/>
+        <path d="M5 5 Q35 5 35 35 Q35 5 65 5" stroke="rgba(200,151,58,0.5)" stroke-width="1" fill="none"/>
+        <circle cx="5" cy="5" r="3" fill="rgba(200,151,58,0.5)"/>
+        <circle cx="35" cy="35" r="2" fill="rgba(200,151,58,0.3)"/>
+        <circle cx="35" cy="5" r="1.5" fill="rgba(200,151,58,0.4)"/>
+        <circle cx="5" cy="35" r="1.5" fill="rgba(200,151,58,0.4)"/>
+      </svg>
+    </div>
+
+    <div class="card-content">
+
+      <!-- Header -->
+      <div class="header">
+        <!-- Dharma Wheel -->
+        <svg class="dharma-wheel" viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="28" cy="28" r="25" stroke="#C8973A" stroke-width="2" fill="rgba(200,151,58,0.04)"/>
+          <circle cx="28" cy="28" r="18" stroke="#C8973A" stroke-width="1.5" fill="none" stroke-dasharray="3 2"/>
+          <circle cx="28" cy="28" r="5" stroke="#C8973A" stroke-width="2" fill="rgba(200,151,58,0.15)"/>
+          <g stroke="#C8973A" stroke-width="1.5" stroke-linecap="round">
+            <!-- 8 spokes -->
+            <line x1="28" y1="23" x2="28" y2="10"/>
+            <line x1="28" y1="33" x2="28" y2="46"/>
+            <line x1="23" y1="28" x2="10" y2="28"/>
+            <line x1="33" y1="28" x2="46" y2="28"/>
+            <line x1="24.8" y1="24.8" x2="15.86" y2="15.86"/>
+            <line x1="31.2" y1="31.2" x2="40.14" y2="40.14"/>
+            <line x1="31.2" y1="24.8" x2="40.14" y2="15.86"/>
+            <line x1="24.8" y1="31.2" x2="15.86" y2="40.14"/>
+          </g>
+          <!-- Outer decorative dots -->
+          <circle cx="28" cy="3" r="1.5" fill="#C8973A"/>
+          <circle cx="28" cy="53" r="1.5" fill="#C8973A"/>
+          <circle cx="3" cy="28" r="1.5" fill="#C8973A"/>
+          <circle cx="53" cy="28" r="1.5" fill="#C8973A"/>
+        </svg>
+
+        <div class="event-subtitle">🪷 Special Guest Portal 🪷</div>
+        <div class="event-title">Bathi Gee Sanda</div>
+        <div class="event-title-sinhala">Buddhist Devotional Concert</div>
+
+        <div class="divider">
+          <div class="divider-line"></div>
+          <div class="divider-lotus">☸</div>
+          <div class="divider-line"></div>
+        </div>
+
+        <div class="event-meta">
+          <div class="meta-item">
+            <span class="meta-label">Date</span>
+            <span class="meta-value">15th June, 2025</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-label">Venue</span>
+            <span class="meta-value">BMICH, Colombo</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-label">Time</span>
+            <span class="meta-value">6:30 PM</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section heading -->
+      <div class="section-heading">
+        <h2>Access Your Guest Pass</h2>
+        <p>Present your special code or scan the QR provided in your invitation</p>
+      </div>
+
+      <!-- Tabs -->
+      <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab('code')" id="tab-code">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="2"/><line x1="8" y1="8" x2="16" y2="8"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="8" y1="16" x2="12" y2="16"/></svg>
+          Enter Code
+        </button>
+        <button class="tab-btn" onclick="switchTab('qr')" id="tab-qr">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="5" y="5" width="3" height="3" fill="currentColor"/><rect x="16" y="5" width="3" height="3" fill="currentColor"/><rect x="5" y="16" width="3" height="3" fill="currentColor"/><line x1="14" y1="14" x2="14" y2="14"/><line x1="17" y1="14" x2="17" y2="14"/><line x1="20" y1="14" x2="20" y2="14"/><line x1="14" y1="17" x2="14" y2="17"/><line x1="17" y1="17" x2="20" y2="17"/><line x1="20" y1="20" x2="20" y2="20"/><line x1="14" y1="20" x2="17" y2="20"/></svg>
+          Scan QR Code
+        </button>
+      </div>
+
+      <!-- Code entry panel -->
+      <div class="input-panel active" id="panel-code">
+        <label class="code-input-label" for="guestCode">Your Invitation Code</label>
+        <div class="code-input-wrap">
+          <input type="text" id="guestCode" class="code-input"
+            placeholder="e.g. BGS-2025-001"
+            maxlength="16"
+            autocomplete="off" autocorrect="off" spellcheck="false"
+            oninput="this.value=this.value.toUpperCase()"
+            onkeydown="if(event.key==='Enter') lookupCode()" />
+        </div>
+        <button class="lookup-btn" onclick="lookupCode()" id="lookup-btn">
+          ✦ Retrieve My Guest Pass ✦
+        </button>
+        <div class="msg-error" id="code-error">
+          This code does not match any invitation. Please check your invitation letter and try again.
+        </div>
+      </div>
+
+      <!-- QR scanner panel -->
+      <div class="input-panel" id="panel-qr">
+        <div class="qr-wrapper" id="qr-wrapper">
+          <div class="qr-placeholder" id="qr-placeholder">
+            <svg width="80" height="80" viewBox="0 0 80 80" fill="none" stroke="#9A6070" stroke-width="2">
+              <rect x="8" y="8" width="26" height="26" rx="3"/>
+              <rect x="46" y="8" width="26" height="26" rx="3"/>
+              <rect x="8" y="46" width="26" height="26" rx="3"/>
+              <rect x="13" y="13" width="16" height="16" fill="rgba(154,96,112,0.2)"/>
+              <rect x="51" y="13" width="16" height="16" fill="rgba(154,96,112,0.2)"/>
+              <rect x="13" y="51" width="16" height="16" fill="rgba(154,96,112,0.2)"/>
+              <line x1="46" y1="46" x2="46" y2="52"/>
+              <line x1="52" y1="46" x2="52" y2="46"/>
+              <line x1="58" y1="46" x2="72" y2="46"/>
+              <line x1="46" y1="52" x2="58" y2="52"/>
+              <line x1="64" y1="52" x2="72" y2="52"/>
+              <line x1="46" y1="58" x2="46" y2="72"/>
+              <line x1="52" y1="58" x2="64" y2="58"/>
+              <line x1="52" y1="64" x2="52" y2="72"/>
+              <line x1="58" y1="64" x2="72" y2="64"/>
+              <line x1="64" y1="58" x2="64" y2="64"/>
+              <line x1="70" y1="58" x2="70" y2="72"/>
+            </svg>
+            <p>Position your QR code within the camera frame</p>
+          </div>
+          <div id="reader"></div>
+        </div>
+        <button class="qr-start-btn" onclick="startQR()" id="qr-start-btn">
+          ✦ Open Camera to Scan ✦
+        </button>
+        <p class="qr-note">Your QR code was provided in your special invitation envelope</p>
+        <div class="msg-error" id="qr-error">
+          QR code not recognised. Please use the code entry tab instead.
+        </div>
+      </div>
+
+      <!-- Guest pass result -->
+      <div class="guest-pass" id="guest-pass">
+        <div class="pass-header">
+          <div class="pass-header-title">Bathi Gee Sanda — Official Guest Pass</div>
+          <div class="pass-header-badge" id="pass-tier">VIP Guest</div>
+        </div>
+        <div class="pass-body">
+          <div class="pass-guest-name" id="pass-name">Ayesha Perera</div>
+          <div class="pass-greeting">
+            Welcome, beloved guest. May your evening be filled with Dhamma and serenity.
+          </div>
+          <div class="pass-grid">
+            <div class="pass-field">
+              <span class="pass-field-label">Seat Number</span>
+              <span class="pass-field-value seat" id="pass-seat">A-14</span>
+            </div>
+            <div class="pass-field">
+              <span class="pass-field-label">Section</span>
+              <span class="pass-field-value" id="pass-section">Front Orchestra</span>
+            </div>
+            <div class="pass-field">
+              <span class="pass-field-label">Guest Category</span>
+              <span class="pass-field-value" id="pass-category">Honoured Patron</span>
+            </div>
+            <div class="pass-field">
+              <span class="pass-field-label">Arrival Time</span>
+              <span class="pass-field-value" id="pass-arrival">5:45 PM</span>
+            </div>
+            <div class="pass-field">
+              <span class="pass-field-label">Meal</span>
+              <span class="pass-field-value" id="pass-meal">Included</span>
+            </div>
+            <div class="pass-field">
+              <span class="pass-field-label">Entry Gate</span>
+              <span class="pass-field-value" id="pass-gate">Gate 1 – Main</span>
+            </div>
+          </div>
+          <div class="pass-perks">
+            <span class="pass-perks-label">Special Privileges</span>
+            <div class="perks-list" id="pass-perks"></div>
+          </div>
+        </div>
+        <div class="pass-footer">
+          <div class="pass-code-display" id="pass-code-display">BGS-000</div>
+          <div class="pass-valid">
+            <div class="pass-valid-dot"></div>
+            Verified & Valid
+          </div>
+        </div>
+      </div>
+
+      <!-- Bottom lotus ornament -->
+      <div class="lotus-ornament" style="margin-top:30px;">☸ &nbsp; 🪷 &nbsp; ☸</div>
+
+    </div><!-- /card-content -->
+  </div><!-- /main-card -->
+
+  <div class="page-footer">
+    <p>Presented by <a href="https://homelands.lk" target="_blank">Home Lands Holding Pvt Ltd</a> &nbsp;✦&nbsp; Bathi Gee Sanda 2025</p>
+  </div>
+
+</div><!-- /page-wrap -->
+
+<script>
+// ═══════════════════════════════════════════
+//  GUEST DATABASE  (demo entries)
+// ═══════════════════════════════════════════
+const GUESTS = {
+  "BGS-2025-001": {
+    name: "Venerable Nāyaka Thero",
+    seat: "R-01",
+    section: "Royal Reserved",
+    category: "Most Venerated Guest",
+    tier: "Dhamma Patron",
+    arrival: "5:30 PM",
+    gate: "Gate 1 – Main",
+    meal: "Vegetarian Feast",
+    perks: ["🪷 VIP Lounge Access", "🎁 Gift Parcel", "📸 Photo Opportunity", "🍃 Welcome Tea Ceremony", "🎶 Backstage Pass"]
+  },
+  "BGS-2025-002": {
+    name: "Nimal & Kamala Silva",
+    seat: "A-12",
+    section: "Front Orchestra",
+    category: "Honoured Patron",
+    tier: "VIP Guest",
+    arrival: "5:45 PM",
+    gate: "Gate 1 – Main",
+    meal: "Included",
+    perks: ["🪷 VIP Lounge Access", "🎁 Gift Parcel", "🍃 Welcome Refreshments"]
+  },
+  "BGS-2025-003": {
+    name: "Mrs. Sandya Jayawardena",
+    seat: "B-05",
+    section: "Centre Orchestra",
+    category: "Special Invitee",
+    tier: "Special Guest",
+    arrival: "6:00 PM",
+    gate: "Gate 2 – East",
+    meal: "Included",
+    perks: ["🪷 Reserved Parking", "🎁 Programme Booklet", "🍃 Welcome Refreshments"]
+  },
+  "BGS-2025-004": {
+    name: "Hon. Minister Ruwan Perera",
+    seat: "R-03",
+    section: "Royal Reserved",
+    category: "Distinguished Guest",
+    tier: "VVIP",
+    arrival: "5:15 PM",
+    gate: "Gate 1 – Main",
+    meal: "Gala Dinner",
+    perks: ["🪷 VVIP Lounge", "🎁 Gift Hamper", "📸 Official Photo", "🚗 Chauffeur Arranged", "🎶 Backstage Access", "🍃 Private Welcome"]
+  },
+  "BGS-2025-VIP": {
+    name: "Ayesha Fernando",
+    seat: "C-08",
+    section: "Balcony Premier",
+    category: "Corporate Patron",
+    tier: "VIP Guest",
+    arrival: "6:00 PM",
+    gate: "Gate 3 – West",
+    meal: "Included",
+    perks: ["🪷 Reserved Seating", "🎁 Gift Parcel", "🍃 Refreshments"]
+  },
+  // Demo/test codes
+  "DEMO": {
+    name: "Honoured Guest",
+    seat: "D-01",
+    section: "Balcony",
+    category: "Demo Entry",
+    tier: "Guest",
+    arrival: "6:30 PM",
+    gate: "Gate 2",
+    meal: "Not Included",
+    perks: ["🪷 Reserved Seating", "🎶 Programme Booklet"]
+  }
+};
+
+// ═══════════════════════════════════════════
+//  TAB SWITCHING
+// ═══════════════════════════════════════════
+let qrScanner = null;
+let qrRunning = false;
+
+function switchTab(tab) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.input-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('tab-' + tab).classList.add('active');
+  document.getElementById('panel-' + tab).classList.add('active');
+  hideError('code-error');
+  hideError('qr-error');
+  // Stop QR scanner when switching away
+  if (tab !== 'qr' && qrRunning) stopQR();
+}
+
+// ═══════════════════════════════════════════
+//  CODE LOOKUP
+// ═══════════════════════════════════════════
+function lookupCode() {
+  const code = document.getElementById('guestCode').value.trim().toUpperCase();
+  hideError('code-error');
+  hidePass();
+
+  if (!code) {
+    showError('code-error', 'Please enter your invitation code.');
+    return;
+  }
+
+  const btn = document.getElementById('lookup-btn');
+  btn.disabled = true;
+  btn.textContent = '⌛ Searching…';
+
+  setTimeout(() => {
+    btn.disabled = false;
+    btn.textContent = '✦ Retrieve My Guest Pass ✦';
+
+    const guest = GUESTS[code];
+    if (guest) {
+      showPass(guest, code);
+    } else {
+      showError('code-error', 'This code does not match any invitation. Please check your invitation letter and try again.');
+    }
+  }, 900);
+}
+
+// ═══════════════════════════════════════════
+//  QR SCANNER
+// ═══════════════════════════════════════════
+function startQR() {
+  if (qrRunning) return;
+  hideError('qr-error');
+  hidePass();
+  document.getElementById('qr-placeholder').style.display = 'none';
+  document.getElementById('qr-start-btn').textContent = '⌛ Camera starting…';
+
+  qrScanner = new Html5Qrcode("reader");
+  qrScanner.start(
+    { facingMode: "environment" },
+    { fps: 10, qrbox: { width: 220, height: 220 } },
+    (decodedText) => {
+      stopQR();
+      const code = decodedText.trim().toUpperCase();
+      const guest = GUESTS[code];
+      switchTab('code');
+      document.getElementById('guestCode').value = code;
+      if (guest) {
+        showPass(guest, code);
+      } else {
+        showError('code-error', 'QR code scanned but not found in guest list. Please contact the event desk.');
+      }
+    },
+    () => {}
+  ).then(() => {
+    qrRunning = true;
+    document.getElementById('qr-start-btn').textContent = '⏹ Stop Camera';
+    document.getElementById('qr-start-btn').onclick = stopQR;
+  }).catch(err => {
+    document.getElementById('qr-placeholder').style.display = 'flex';
+    document.getElementById('qr-start-btn').textContent = '✦ Open Camera to Scan ✦';
+    showError('qr-error', 'Camera access denied or unavailable. Please enter your code manually.');
+    console.error(err);
+  });
+}
+
+function stopQR() {
+  if (qrScanner && qrRunning) {
+    qrScanner.stop().then(() => {
+      qrScanner.clear();
+      qrRunning = false;
+      document.getElementById('reader').innerHTML = '';
+      document.getElementById('qr-placeholder').style.display = '';
+      document.getElementById('qr-start-btn').textContent = '✦ Open Camera to Scan ✦';
+      document.getElementById('qr-start-btn').onclick = startQR;
+    });
+  }
+}
+
+// ═══════════════════════════════════════════
+//  SHOW / HIDE PASS
+// ═══════════════════════════════════════════
+function showPass(guest, code) {
+  document.getElementById('pass-name').textContent = guest.name;
+  document.getElementById('pass-seat').textContent = guest.seat;
+  document.getElementById('pass-section').textContent = guest.section;
+  document.getElementById('pass-category').textContent = guest.category;
+  document.getElementById('pass-tier').textContent = guest.tier;
+  document.getElementById('pass-arrival').textContent = guest.arrival;
+  document.getElementById('pass-gate').textContent = guest.gate;
+  document.getElementById('pass-meal').textContent = guest.meal;
+  document.getElementById('pass-code-display').textContent = code;
+
+  const perksList = document.getElementById('pass-perks');
+  perksList.innerHTML = '';
+  guest.perks.forEach(p => {
+    const tag = document.createElement('div');
+    tag.className = 'perk-tag';
+    tag.textContent = p;
+    perksList.appendChild(tag);
+  });
+
+  const pass = document.getElementById('guest-pass');
+  pass.classList.remove('visible');
+  void pass.offsetWidth; // reflow to restart animation
+  pass.classList.add('visible');
+  pass.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function hidePass() {
+  document.getElementById('guest-pass').classList.remove('visible');
+}
+
+// ═══════════════════════════════════════════
+//  ERRORS
+// ═══════════════════════════════════════════
+function showError(id, msg) {
+  const el = document.getElementById(id);
+  el.textContent = msg;
+  el.classList.remove('visible');
+  void el.offsetWidth;
+  el.classList.add('visible');
+}
+function hideError(id) {
+  document.getElementById(id).classList.remove('visible');
+}
+</script>
+</body>
+</html>
